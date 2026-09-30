@@ -117,7 +117,7 @@ erDiagram
     Book ||--o{ BookAuthor : "має"
     Author ||--o{ BookAuthor : "зазначений у"
     Book }o--o{ Genre : "належить до"
-    Genre ||--o{ Genre : "є піджанром"
+    Genre |o--o{ Genre : "є піджанром"
     Book ||--o{ Loan : "видається"
     Book ||--o{ Review : "отримує"
     Book ||--o{ ReadingProgress : "читається"
