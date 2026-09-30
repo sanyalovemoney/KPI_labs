@@ -1,0 +1,125 @@
+---
+title: ER-модель онлайн-бібліотеки з підпискою
+---
+erDiagram
+    User {
+        string user_id PK
+        string email UK
+        string display_name
+        string password_hash
+        string locale
+        datetime registered_at
+        string status
+    }
+
+    Plan {
+        string plan_id PK
+        string code UK
+        string title
+        int price_cents
+        string currency
+        int duration_days
+        int max_concurrent_loans
+    }
+
+    Subscription {
+        string subscription_id PK
+        string user_id FK
+        string plan_id FK
+        datetime started_at
+        datetime expires_at
+        string status
+        bool auto_renew
+    }
+
+    Payment {
+        string payment_id PK
+        string subscription_id FK
+        int amount_cents
+        string currency
+        datetime paid_at
+        string method
+        string status
+        string external_txn_id UK
+    }
+
+    Book {
+        string book_id PK
+        string isbn UK
+        string title
+        string publisher_id FK
+        int published_year
+        string language
+        int page_count
+        string description
+    }
+
+    Publisher {
+        string publisher_id PK
+        string name
+        string country
+    }
+
+    Author {
+        string author_id PK
+        string full_name
+        string country
+        string bio
+    }
+
+    BookAuthor {
+        string book_id PK, FK
+        string author_id PK, FK
+        string role
+        int ordinal
+    }
+
+    Genre {
+        string genre_id PK
+        string code UK
+        string title
+        string parent_genre_id FK
+    }
+
+    Loan {
+        string loan_id PK
+        string user_id FK
+        string book_id FK
+        datetime borrowed_at
+        datetime due_at
+        datetime returned_at
+        string status
+    }
+
+    Review {
+        string review_id PK
+        string user_id FK
+        string book_id FK
+        int rating
+        string body
+        datetime created_at
+    }
+
+    ReadingProgress {
+        string progress_id PK
+        string user_id FK
+        string book_id FK
+        int last_page
+        int percent
+        datetime updated_at
+    }
+
+    User ||--o{ Subscription : "має"
+    User ||--o{ Loan : "бере"
+    User ||--o{ Review : "пише"
+    User ||--o{ ReadingProgress : "накопичує"
+    Plan ||--o{ Subscription : "оформлюється за"
+    Subscription ||--o{ Payment : "оплачується"
+    Publisher ||--o{ Book : "видає"
+    Book ||--o{ BookAuthor : "має"
+    Author ||--o{ BookAuthor : "зазначений у"
+    Book }o--o{ Genre : "належить до"
+    Genre ||--o{ Genre : "є піджанром"
+    Book ||--o{ Loan : "видається"
+    Book ||--o{ Review : "отримує"
+    Book ||--o{ ReadingProgress : "читається"
