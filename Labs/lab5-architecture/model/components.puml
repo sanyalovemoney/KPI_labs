@@ -1,0 +1,35 @@
+@startuml components
+skinparam componentStyle rectangle
+
+package "Клієнт" {
+  [Web UI]
+}
+
+package "Backend" {
+  [REST API]
+  [AuthModule]
+  [CatalogModule]
+  [SubscriptionModule]
+  [PaymentModule]
+  [LoanModule]
+  [ReviewModule]
+  [ProgressModule]
+  [DataAccess]
+  database "Database" as DB
+  cloud "Payment Gateway" as PG
+}
+
+[Web UI] --> [REST API]
+[REST API] --> [AuthModule]
+[REST API] --> [CatalogModule]
+[REST API] --> [SubscriptionModule]
+[REST API] --> [LoanModule]
+[REST API] --> [ReviewModule]
+[REST API] --> [ProgressModule]
+[SubscriptionModule] --> [PaymentModule]
+[PaymentModule] --> PG
+[LoanModule] --> [SubscriptionModule]
+[SubscriptionModule] --> [LoanModule]
+modулі --> [DataAccess]
+[DataAccess] --> DB
+@enduml
