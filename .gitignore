@@ -1,0 +1,18 @@
+# Внутрішні файли процесу — не для рев'ю
+WORKFLOW.md
+plan.md
+
+# Матеріали для здачі й особистої підготовки
+Labs/*/submit/
+Labs/*/theory.md
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Тимчасові файли
+*.tmp
+*.log
+Thumbs.db
+desktop.ini
