@@ -13,11 +13,23 @@ sequenceDiagram
     end
     CatalogService-->>LoanService: true
     LoanService->>SubscriptionService: isActive(читач)
-    SubscriptionService-->>LoanService: true
-    LoanService->>LoanRepository: countActive(читач)
-    LoanRepository-->>LoanService: 2
-    alt ліміт не перевищено
+    SubscriptionService-->>LoanService: результат перевірки
+    alt підписка неактивна (REQ-04)
+        LoanService-->>Читач: "Потрібна активна підписка"
+    else блокування через прострочення (REQ-07)
+        LoanService-->>Читач: "Нові позики заблоковано до повернення"
+    else ліміт перевищено (REQ-04)
+        LoanService->>LoanRepository: countActive(читач)
+        LoanRepository-->>LoanService: 5
+        LoanService-->>Читач: "Ліміт вичерпано, поверніть книгу"
+    else успішна позика
+        LoanService->>LoanRepository: countActive(читач)
+        LoanRepository-->>LoanService: 2
         LoanService->>LoanRepository: createLoan(читач, bookId, due_at=now+30d)
         LoanRepository-->>LoanService: loanId
         LoanService-->>Читач: "Книгу позику взято"
+    end
+    loop кожна активна позика за три дні до due_at (UC-12)
+        LoanService->>LoanRepository: findDueSoon(читач)
+        LoanRepository-->>LoanService: [loanId...]
     end
