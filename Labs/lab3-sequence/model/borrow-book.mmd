@@ -1,29 +1,35 @@
 sequenceDiagram
     actor Читач
+    participant UI as Web UI
     participant LoanService
     participant CatalogService
     participant SubscriptionService
     participant LoanRepository
 
-    Читач->>LoanService: позичити книгу (bookId)
+    Читач->>UI: позичити книгу (bookId)
+    UI->>LoanService: borrowBook(bookId)
     LoanService->>CatalogService: exists(bookId)
     opt книги немає в каталозі
         CatalogService-->>LoanService: notFound(bookId)
-        LoanService-->>Читач: "Книги немає в каталозі"
+        LoanService-->>UI: "Книги немає в каталозі"
+        UI-->>Читач: "Книги немає в каталозі"
     end
     CatalogService-->>LoanService: true
     LoanService->>SubscriptionService: isSubscriptionActive(читач)
     SubscriptionService-->>LoanService: результат перевірки
     alt підписка неактивна (REQ-04)
-        LoanService-->>Читач: "Потрібна активна підписка"
+        LoanService-->>UI: "Потрібна активна підписка"
+        UI-->>Читач: "Потрібна активна підписка"
     else блокування через прострочення (REQ-07)
-        LoanService-->>Читач: "Нові позики заблоковано до повернення"
+        LoanService-->>UI: "Нові позики заблоковано до повернення"
+        UI-->>Читач: "Нові позики заблоковано до повернення"
     else ліміт перевищено (REQ-04)
         LoanService->>SubscriptionService: getMaxConcurrentLoans()
         SubscriptionService-->>LoanService: 5
         LoanService->>LoanRepository: countActive(читач)
         LoanRepository-->>LoanService: 5
-        LoanService-->>Читач: "Ліміт 5 з 5, поверніть книгу"
+        LoanService-->>UI: "Ліміт 5 з 5, поверніть книгу"
+        UI-->>Читач: "Ліміт 5 з 5, поверніть книгу"
     else успішна позика
         LoanService->>SubscriptionService: getMaxConcurrentLoans()
         SubscriptionService-->>LoanService: 5
@@ -31,7 +37,8 @@ sequenceDiagram
         LoanRepository-->>LoanService: 2
         LoanService->>LoanRepository: createLoan(читач, bookId, due_at=now+30d)
         LoanRepository-->>LoanService: loanId
-        LoanService-->>Читач: "Книгу позику взято"
+        LoanService-->>UI: "Книгу позику взято"
+        UI-->>Читач: "Книгу позику взято"
     end
     loop кожна активна позика за три дні до due_at (UC-12)
         LoanService->>LoanRepository: findDueSoon(читач)
