@@ -1,16 +1,23 @@
 sequenceDiagram
     actor Читач
-    participant BorrowController
+    participant LoanService
+    participant CatalogService
     participant SubscriptionService
     participant LoanRepository
 
-    Читач->>BorrowController: позичити книгу (bookId)
-    BorrowController->>SubscriptionService: isActive(читач)
-    SubscriptionService-->>BorrowController: true
-    BorrowController->>LoanRepository: countActive(читач)
-    LoanRepository-->>BorrowController: 2
+    Читач->>LoanService: позичити книгу (bookId)
+    LoanService->>CatalogService: exists(bookId)
+    opt книги немає в каталозі
+        CatalogService-->>LoanService: notFound(bookId)
+        LoanService-->>Читач: "Книги немає в каталозі"
+    end
+    CatalogService-->>LoanService: true
+    LoanService->>SubscriptionService: isActive(читач)
+    SubscriptionService-->>LoanService: true
+    LoanService->>LoanRepository: countActive(читач)
+    LoanRepository-->>LoanService: 2
     alt ліміт не перевищено
-        BorrowController->>LoanRepository: createLoan(читач, bookId, due_at=now+30d)
-        LoanRepository-->>BorrowController: loanId
-        BorrowController-->>Читач: "Книгу позику взято"
+        LoanService->>LoanRepository: createLoan(читач, bookId, due_at=now+30d)
+        LoanRepository-->>LoanService: loanId
+        LoanService-->>Читач: "Книгу позику взято"
     end
