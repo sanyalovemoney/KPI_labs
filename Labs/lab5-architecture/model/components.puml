@@ -14,10 +14,13 @@ package "Backend" {
   [LoanModule]
   [ReviewModule]
   [ProgressModule]
+  [PaymentGatewayAdapter]
   [DataAccess]
   database "Database" as DB
-  cloud "Payment Gateway" as PG
 }
+
+' зовнішні системи — актори Lab2 / swimlane Lab4, поза межею
+cloud "Payment Gateway" as PG
 
 [Web UI] --> [REST API]
 [REST API] --> [AuthModule]
@@ -27,7 +30,8 @@ package "Backend" {
 [REST API] --> [ReviewModule]
 [REST API] --> [ProgressModule]
 [SubscriptionModule] --> [PaymentModule]
-[PaymentModule] --> PG
+[PaymentModule] --> [PaymentGatewayAdapter]
+[PaymentGatewayAdapter] --> PG
 [LoanModule] --> [SubscriptionModule]
 [SubscriptionModule] --> [LoanModule]
 modулі --> [DataAccess]
