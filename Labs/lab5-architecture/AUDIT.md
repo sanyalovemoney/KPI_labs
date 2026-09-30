@@ -35,9 +35,12 @@ PlantUML створює фантомний вузол, репозиторій ф
 з'єднаний. І друге: усі зв'язки — голі стрілки, а критерій вимагає
 provided/required хоча б на межах (шлюз, пошта, OAuth).
 
-→ Фікс: з'єднати кожен модуль з `DataAccess` через
-provided `<interface> IRepository<T>`; зовнішнім точкам контакту —
-`IPaymentProvider`, `IEmailSender`, `IOAuthProvider`.
+→ Фікс: замість фантомного рядка — DataAccess розпакується на йменні
+репозиторії (UserRepository, BookRepository, SubscriptionRepository,
+PaymentRepository, LoanRepository, ReviewRepository, ProgressRepository),
+кожен модуль залежить від свого, усі вони впираються в Database; зовнішнім
+точкам контакту — порти `IPaymentProvider`, `IEmailSender`, `IOAuthProvider`
+з адаптерами всередині межі (ports-and-adapters).
 → Commit: `lab5: fix - wire DataAccess via repositories, add interfaces`
 
 ## Узгодженість ланцюга (перевірено, окрім #1/#2)
@@ -45,7 +48,8 @@ provided `<interface> IRepository<T>`; зовнішнім точкам конт�
 - `CatalogModule -> DB`: Book/Author/Genre/BookAuthor — Lab1.
 - `ProgressModule`: REQ-05, ReadingProgress (унікальна пара user+book —
   ключ з аудиту Lab1).
-- `ReviewModule`: REQ-06/10/12, UC-09/UC-10 з Lab2 (Бібліотекар).
+- `ReviewModule`: REQ-06/10/12, UC-09 (відгук) і UC-11 (модерація, Бібліотекар)
+  з Lab2 — нумерація по виправленій діаграмі.
 - `AuthModule`: REQ-01 + повторний лист REQ-11 (той самий непокритий UC —
   тут він покритий компонентом, бо фонові процеси живуть у коді, а не в
   варіантах використання).
