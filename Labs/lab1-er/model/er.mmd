@@ -93,8 +93,8 @@ erDiagram
 
     Review {
         string review_id PK
-        string user_id FK
-        string book_id FK
+        string user_id FK, UK
+        string book_id FK, UK
         int rating
         string body
         datetime created_at
@@ -102,8 +102,8 @@ erDiagram
 
     ReadingProgress {
         string progress_id PK
-        string user_id FK
-        string book_id FK
+        string user_id FK, UK
+        string book_id FK, UK
         int last_page
         int percent
         datetime updated_at
