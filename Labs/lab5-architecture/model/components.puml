@@ -32,8 +32,8 @@ cloud "Payment Gateway" as PG
 [SubscriptionModule] --> [PaymentModule]
 [PaymentModule] --> [PaymentGatewayAdapter]
 [PaymentGatewayAdapter] --> PG
+' один напрямок, як у Lab3: LoanService питає SubscriptionService
 [LoanModule] --> [SubscriptionModule]
-[SubscriptionModule] --> [LoanModule]
 modулі --> [DataAccess]
 [DataAccess] --> DB
 @enduml
