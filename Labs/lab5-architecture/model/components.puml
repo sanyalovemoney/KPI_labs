@@ -15,12 +15,26 @@ package "Backend" {
   [ReviewModule]
   [ProgressModule]
   [PaymentGatewayAdapter]
-  [DataAccess]
+  package "DataAccess (репозиторії)" {
+    [UserRepository]
+    [BookRepository]
+    [SubscriptionRepository]
+    [PaymentRepository]
+    [LoanRepository]
+    [ReviewRepository]
+    [ProgressRepository]
+  }
   database "Database" as DB
 }
 
 ' зовнішні системи — актори Lab2 / swimlane Lab4, поза межею
 cloud "Payment Gateway" as PG
+cloud "Email Service" as MAIL
+cloud "OAuth Provider" as OAUTH
+
+interface "IPaymentProvider" as IPP
+interface "IEmailSender" as IES
+interface "IOAuthProvider" as IOA
 
 [Web UI] --> [REST API]
 [REST API] --> [AuthModule]
@@ -29,11 +43,34 @@ cloud "Payment Gateway" as PG
 [REST API] --> [LoanModule]
 [REST API] --> [ReviewModule]
 [REST API] --> [ProgressModule]
+
 [SubscriptionModule] --> [PaymentModule]
-[PaymentModule] --> [PaymentGatewayAdapter]
+[PaymentModule] ..> IPP
+[PaymentGatewayAdapter] ..|> IPP
 [PaymentGatewayAdapter] --> PG
-' один напрямок, як у Lab3: LoanService питає SubscriptionService
+
+[AuthModule] ..> IOA
+[AuthModule] ..> IES
+[CatalogModule] ..> IES
+IOA <|.. OAUTH : adapter
+IES <|.. MAIL : adapter
+
+' один напрямок, як у Lab3: LoanModule питає SubscriptionService
 [LoanModule] --> [SubscriptionModule]
-modулі --> [DataAccess]
-[DataAccess] --> DB
+
+[AuthModule] --> [UserRepository]
+[CatalogModule] --> [BookRepository]
+[SubscriptionModule] --> [SubscriptionRepository]
+[PaymentModule] --> [PaymentRepository]
+[LoanModule] --> [LoanRepository]
+[ReviewModule] --> [ReviewRepository]
+[ProgressModule] --> [ProgressRepository]
+
+[UserRepository] --> DB
+[BookRepository] --> DB
+[SubscriptionRepository] --> DB
+[PaymentRepository] --> DB
+[LoanRepository] --> DB
+[ReviewRepository] --> DB
+[ProgressRepository] --> DB
 @enduml
