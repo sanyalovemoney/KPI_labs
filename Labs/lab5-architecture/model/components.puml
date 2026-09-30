@@ -14,7 +14,13 @@ package "Backend" {
   [LoanModule]
   [ReviewModule]
   [ProgressModule]
-  [PaymentGatewayAdapter]
+
+  package "Adapters (зовнішні інтеграції)" {
+    [PaymentGatewayAdapter]
+    [EmailSenderAdapter]
+    [OAuthClientAdapter]
+  }
+
   package "DataAccess (репозиторії)" {
     [UserRepository]
     [BookRepository]
@@ -32,6 +38,7 @@ cloud "Payment Gateway" as PG
 cloud "Email Service" as MAIL
 cloud "OAuth Provider" as OAUTH
 
+' required-порти (абстракції всередині межі)
 interface "IPaymentProvider" as IPP
 interface "IEmailSender" as IES
 interface "IOAuthProvider" as IOA
@@ -44,16 +51,23 @@ interface "IOAuthProvider" as IOA
 [REST API] --> [ReviewModule]
 [REST API] --> [ProgressModule]
 
+' виклик позики підписки (UC-03 include UC-04, Lab2)
 [SubscriptionModule] --> [PaymentModule]
-[PaymentModule] ..> IPP
-[PaymentGatewayAdapter] ..|> IPP
-[PaymentGatewayAdapter] --> PG
 
-[AuthModule] ..> IOA
+' модулі залежать лише на абстракцію порту, не на конкретний сервіс
+[PaymentModule] ..> IPP
+[SubscriptionModule] ..> IES
 [AuthModule] ..> IES
-[CatalogModule] ..> IES
-IOA <|.. OAUTH : adapter
-IES <|.. MAIL : adapter
+[LoanModule] ..> IES
+[AuthModule] ..> IOA
+
+' адаптери реалізують порт і дивляться на зовнішню систему
+[PaymentGatewayAdapter] ..|> IPP
+[EmailSenderAdapter] ..|> IES
+[OAuthClientAdapter] ..|> IOA
+[PaymentGatewayAdapter] --> PG
+[EmailSenderAdapter] --> MAIL
+[OAuthClientAdapter] --> OAUTH
 
 ' один напрямок, як у Lab3: LoanModule питає SubscriptionService
 [LoanModule] --> [SubscriptionModule]
