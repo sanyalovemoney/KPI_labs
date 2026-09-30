@@ -1,0 +1,16 @@
+sequenceDiagram
+    actor Читач
+    participant BorrowController
+    participant SubscriptionService
+    participant LoanRepository
+
+    Читач->>BorrowController: позичити книгу (bookId)
+    BorrowController->>SubscriptionService: isActive(читач)
+    SubscriptionService-->>BorrowController: true
+    BorrowController->>LoanRepository: countActive(читач)
+    LoanRepository-->>BorrowController: 2
+    alt ліміт не перевищено
+        BorrowController->>LoanRepository: createLoan(читач, bookId, due_at=now+30d)
+        LoanRepository-->>BorrowController: loanId
+        BorrowController-->>Читач: "Книгу позику взято"
+    end
