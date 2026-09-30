@@ -35,7 +35,8 @@ UC01 ..> UC02 : <<include>>
 UC03 ..> UC04 : <<include>>
 UC05 ..> UC06 : <<include>>
 UC07 ..> UC08 : <<include>>
-UC10 ..> UC12 : <<include>>
+' нагадування — умовний вкладений крок читання (умова: наближається due_at)
+UC12 ..> UC07 : <<extend>>
 
 UC02 --|> UCNotify
 UC12 --|> UCNotify
