@@ -3,6 +3,7 @@ left to right direction
 skinparam packageStyle rectangle
 
 actor "Читач" as reader
+actor "Бібліотекар" as librarian
 actor "Платіжний шлюз" as gateway
 actor "Поштовий сервіс" as mail
 
@@ -16,6 +17,10 @@ rectangle "Онлайн-бібліотека з підпискою" {
   usecase "UC-07 Читати книгу" as UC07
   usecase "UC-08 Зберегти прогрес читання" as UC08
   usecase "UC-09 Залишити відгук" as UC09
+  usecase "UC-10 Повернути книгу" as UC10
+  usecase "UC-11 Модерувати відгуки" as UC11
+  usecase "Надіслати сповіщення" as UCNotify
+  usecase "Нагадати про повернення" as UC12
 }
 
 reader --> UC01
@@ -23,12 +28,18 @@ reader --> UC03
 reader --> UC05
 reader --> UC07
 reader --> UC09
+reader --> UC10
+librarian --> UC11
 
 UC01 ..> UC02 : <<include>>
 UC03 ..> UC04 : <<include>>
 UC05 ..> UC06 : <<include>>
 UC07 ..> UC08 : <<include>>
+UC10 ..> UC12 : <<include>>
+
+UC02 --|> UCNotify
+UC12 --|> UCNotify
 
 gateway <-- UC04
-mail <-- UC02
+mail <-- UCNotify
 @enduml
