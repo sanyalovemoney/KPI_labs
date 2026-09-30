@@ -46,15 +46,17 @@
 
 **Loan** — видача книги користувачу.
 `loan_id` (PK), `user_id` (FK), `book_id` (FK), `borrowed_at`, `due_at`,
-`returned_at`, `status`.
+`returned_at`. Стан позики (активна / повернена / прострочена) — похідний,
+обчислюється з `returned_at` і `due_at`, не зберігається.
 
 **Review** — відгук користувача про книгу.
 `review_id` (PK), `user_id` (FK), `book_id` (FK), `rating`, `body`, `created_at`.
 Пара (`user_id`, `book_id`) унікальна — один відгук на книгу від користувача.
 
 **ReadingProgress** — прогрес читання.
-`progress_id` (PK), `user_id` (FK), `book_id` (FK), `last_page`, `percent`,
-`updated_at`. Пара (`user_id`, `book_id`) унікальна.
+`progress_id` (PK), `user_id` (FK), `book_id` (FK), `last_page`,
+`updated_at`. Пара (`user_id`, `book_id`) унікальна. Відсоток прочитаного —
+похідний від `last_page` і `Book.page_count`, не зберігається.
 
 ## Зв'язки та кардинальності
 
@@ -82,6 +84,8 @@
       ReadingProgress) виражені в моделі позначкою `UK`, а не лише текстом
 - [ ] Усі ідентифікатори мають тип `string` (uuid) — без змішування `string` і `number`
 - [ ] Модель у 3НФ: немає часткових залежностей від складеного ключа і немає транзитивних залежностей
+- [ ] Похідні значення (`Loan.status`, `ReadingProgress.percent`) у моделі не
+      зберігаються — обчислюються при читанні
 - [ ] Зв'язок Book — Genre подано як чистий M:N, без сполучної сутності
 - [ ] Зв'язок Book — Author подано як асоціативну сутність `BookAuthor`, бо зв'язок несе власні атрибути `role` і `ordinal`
 - [ ] Назви атрибутів у spec і в `model/er.mmd` збігаються символ у символ
