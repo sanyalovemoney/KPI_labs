@@ -18,15 +18,15 @@
 1. **Складені обмеження унікальності описані в spec, але не виражені в моделі** —
    проти spec, розділ «Сутності та атрибути» (`Review`, `ReadingProgress`).
    Модель допускала два відгуки одного користувача на одну книгу.
-   → Commit: `lab1: fix - add composite unique keys for review and progress`
+   → Commit: `737f82c` — lab1: fix - add composite unique keys for review and progress
 
 2. **Похідні атрибути збережені як поля** — `ReadingProgress.percent` і
    `Loan.status` обчислюються з інших даних, збереження дає змогу суперечливим
-   станам. → Commit: `lab1: fix - drop derived attributes from progress and loan`
+   станам. → Commit: `27f2007` — lab1: fix - drop derived attributes from progress and loan
 
 3. **Неправильна кардинальність самозв'язку `Genre`** — `||--o{` вимагав батька
    в кожного жанру, тоді як кореневі жанри його не мають.
-   → Commit: `lab1: fix - genre parent cardinality allows root genres`
+   → Commit: `a190df1` — lab1: fix - genre parent cardinality allows root genres
 
 Усі три виправлені через зміну `spec.md` і критеріїв, а не ручним патчем
 діаграми.
@@ -45,8 +45,9 @@
 `BookGenre` — друге відкинув як порожню обгортку.
 
 → [adr/adr-002-book-author-associative.md](adr/adr-002-book-author-associative.md)
-→ [adr/adr-001-notation.md](adr/adr-001-notation.md) — вибір Mermaid замість
-PlantUML: рендер нативно в GitHub, і на машині немає Java.
+Вибір Mermaid замість PlantUML — не доменне рішення (рендер нативно в GitHub,
+Java на машині немає), тому зафіксований приміткою «Нотація» у [spec.md](spec.md),
+а не окремим ADR.
 
 ## 4. Перевірка узгодженості
 
