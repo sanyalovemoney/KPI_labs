@@ -1,0 +1,53 @@
+@startuml usecase
+left to right direction
+skinparam packageStyle rectangle
+
+title Варіанти використання онлайн-бібліотеки з підпискою
+
+actor "Читач" as reader <<людина>>
+actor "Бібліотекар" as librarian <<людина>>
+actor "Платіжний шлюз" as gateway <<зовнішня система>>
+actor "Поштовий сервіс" as mailer <<зовнішня система>>
+
+rectangle "Онлайн-бібліотека з підпискою" {
+  usecase "Зареєструватися" as UC01
+  usecase "Підтвердити email" as UC02
+  usecase "Оформити підписку" as UC03
+  usecase "Обробити платіж" as UC04
+  usecase "Позичити книгу" as UC05
+  usecase "Читати книгу" as UC06
+  usecase "Нагадати про повернення" as UC07
+  usecase "Повернути книгу" as UC08
+  usecase "Залишити відгук" as UC09
+  usecase "Модерувати відгуки" as UC10
+  usecase "Надіслати сповіщення" as UC11 <<abstract>>
+}
+
+' Читач і Бібліотекар — люди, вони ініціюють власні цілі
+reader --> UC01
+reader --> UC03
+reader --> UC05
+reader --> UC06
+reader --> UC08
+reader --> UC09
+librarian --> UC10
+
+' Зовнішні системи обслуговують платіж і сповіщення
+gateway --> UC04
+mailer --> UC11
+
+' Реєстрація завжди включає підтвердження email
+UC01 ..> UC02 : <<include>>
+' Підписка не оформлюється без обробки платежу шлюзом
+UC03 ..> UC04 : <<include>>
+' Нагадування — умовне розширення читання, а не обов'язковий крок
+UC07 ..> UC06 : <<extend>>
+note on link
+  Умова розширення: до due_at лишилось 2 дні
+  і returned_at порожній
+end note
+
+' Узагальнення: підтвердження email і нагадування — підтипи сповіщення
+UC02 --|> UC11
+UC07 --|> UC11
+@enduml
