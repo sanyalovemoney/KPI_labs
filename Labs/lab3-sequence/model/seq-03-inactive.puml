@@ -1,0 +1,26 @@
+@startuml seq-03-inactive
+title Сценарій 3: неактивний користувач не доходить до оплати (REQ-04)
+autonumber
+
+actor "Читач" as reader
+participant "Веб-UI" as ui
+participant "Сервіс підписок" as subs
+participant "Сервіс платежів" as pay
+actor "Платіжний шлюз" as gateway
+
+reader -> ui : submitSubscription("standard")
+activate ui
+ui -> subs : createSubscription(userId, "standard")
+activate subs
+subs -> subs : checkUserActive(userId)
+alt [• User активний]
+  note right : успішний шлях - сценарій 1
+else [• User не активний]
+  note over subs : Subscription не створюється
+  subs -->> ui : userNotActive()
+  note over gateway : запит до шлюзу не надсилається\nPayment не створюється
+  ui -> reader : showError("user_not_active")
+end
+deactivate subs
+deactivate ui
+@enduml

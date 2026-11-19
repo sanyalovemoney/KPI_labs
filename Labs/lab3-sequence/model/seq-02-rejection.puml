@@ -1,0 +1,39 @@
+@startuml seq-02-rejection
+title Сценарій 2: відмова авторизації скасовує підписку (REQ-03)
+autonumber
+
+actor "Читач" as reader
+participant "Веб-UI" as ui
+participant "Сервіс підписок" as subs
+participant "Сервіс платежів" as pay
+actor "Платіжний шлюз" as gateway
+
+reader -> ui : submitSubscription("standard")
+activate ui
+ui -> subs : createSubscription(userId, "standard")
+activate subs
+subs -> subs : checkUserActive(userId)
+subs -> subs : getPlanByCode("standard")
+subs -> gateway : authorizePayment(subscriptionId, 49900, "UAH")
+deactivate subs
+ui -->> reader : subscriptionPending()
+deactivate ui
+
+gateway -> pay : onGatewayCallback(subscriptionId, declined)
+activate pay
+alt [• авторизація успішна]
+  pay -> subs : activateSubscription(subscriptionId, paid_at)
+  note right : детально - сценарій 1
+else [• авторизація відхилена]
+  pay -> subs : cancelSubscription(subscriptionId)
+  activate subs
+  note over subs : Subscription.status = "canceled"\nPayment зі status = "success" не створюється
+  subs -->> pay : ok
+  deactivate subs
+end
+pay -> ui : subscriptionDeclined(subscriptionId)
+activate ui
+ui -> reader : showError("authorization_declined")
+deactivate ui
+deactivate pay
+@enduml
