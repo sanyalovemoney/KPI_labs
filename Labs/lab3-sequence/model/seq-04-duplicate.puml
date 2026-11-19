@@ -1,0 +1,23 @@
+@startuml seq-04-duplicate
+title Сценарій 4: повторна транзакція шлюзу - ідемпотентність (REQ-05)
+autonumber
+
+participant "Сервіс підписок" as subs
+participant "Сервіс платежів" as pay
+actor "Платіжний шлюз" as gateway
+
+note over subs : Subscription "olya@example.com" уже активна\nPayment "pay-01" з external_txn_id = "gw-8842" існує
+
+gateway -> pay : onGatewayCallback("gw-8842", success)
+activate pay
+pay -> pay : findPaymentByTxn("gw-8842")
+alt [• Payment за таку транзакцію знайдено]
+  pay --> gateway : returnPaymentId("pay-01")
+  note over pay : другий Payment не створюється\nСервіс підписок не задіяний
+else [• Payment не знайдено]
+  pay -> pay : createPayment(subscriptionId, 49900, "UAH", "gw-8842")
+  note right : детально - сценарій 1
+end
+note over subs : expires_at не змінюється
+deactivate pay
+@enduml

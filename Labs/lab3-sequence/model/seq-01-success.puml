@@ -1,0 +1,41 @@
+@startuml seq-01-success
+title Сценарій 1: успішна авторизація активує підписку (REQ-01, REQ-02)
+autonumber
+
+actor "Читач" as reader
+participant "Веб-UI" as ui
+participant "Сервіс підписок" as subs
+participant "Сервіс платежів" as pay
+actor "Платіжний шлюз" as gateway
+
+reader -> ui : submitSubscription("standard")
+activate ui
+ui -> subs : createSubscription(userId, "standard")
+activate subs
+subs -> subs : checkUserActive(userId)
+subs -> subs : getPlanByCode("standard")
+note right : price_cents = 49900, currency = "UAH",\nduration_days = 30
+subs -> gateway : authorizePayment(subscriptionId, 49900, "UAH")
+deactivate subs
+ui -->> reader : subscriptionPending()
+deactivate ui
+
+gateway -> pay : onGatewayCallback("gw-8842", success)
+activate pay
+pay -> pay : findPaymentByTxn("gw-8842")
+opt [• Payment за цю транзакцію ще немає]
+  pay -> pay : createPayment(subscriptionId, 49900, "UAH", "gw-8842")
+  note right : Payment.status = "success"\npaid_at = поточний момент
+  pay -> subs : activateSubscription(subscriptionId, paid_at)
+  activate subs
+  note over subs : Subscription.status = "active"\nstarted_at = paid_at\nexpires_at = started_at + 30 днів
+  subs -->> pay : ok
+  deactivate subs
+end
+pay --> gateway : returnPaymentId("pay-01")
+pay -> ui : subscriptionActivated(subscriptionId)
+activate ui
+ui -> reader : showResult("active")
+deactivate ui
+deactivate pay
+@enduml
