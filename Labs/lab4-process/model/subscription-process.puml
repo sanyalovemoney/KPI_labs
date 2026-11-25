@@ -1,0 +1,63 @@
+@startuml subscription-process
+title Процес «Оформлення підписки» (UC з Lab2, REQ-01..REQ-05)
+|#lightblue|Читач|
+start
+:submitSubscription("standard");
+|#lightgreen|Веб-UI|
+:передати в Сервіс підписок;
+|#lightyellow|Сервіс підписок|
+:createSubscription(userId, "standard");
+:checkUserActive(userId);
+if (• User активний?) then (• так)
+  :getPlanByCode("standard");
+  note right: price_cents = 49900\ncurrency = "UAH"\nduration_days = 30
+  :створення Subscription (status = "pending") (REQ-01);
+  :authorizePayment(subscriptionId, 49900, "UAH") <<send signal>>;
+  |#lightgreen|Веб-UI|
+  :subscriptionPending();
+  note right: продовження без очікування - читач поінформований\nпроцес триває без нього
+  detach
+else (• ні)
+  :userNotActive();
+  |#lightgreen|Веб-UI|
+  :showError("user_not_active");
+  stop
+endif
+
+|#lightyellow|Сервіс платежів|
+#palegreen:onGatewayCallback("gw-8842", result) <<accept event>>;
+note right: Потік B - окрема точка входу\nсюди входить і повторна транзакція (REQ-05)
+:findPaymentByTxn("gw-8842");
+if (• Payment за таку транзакцію знайдено?) then (• так)
+  :returnPaymentId("pay-01");
+  note right: REQ-05 - другий Payment не створюється\nexpires_at не змінюється
+  stop
+else (• не знайдено)
+  :createPayment(subscriptionId, 49900, "UAH", "gw-8842");
+  if (• результат авторизації?) then (• успіх)
+    note right: Payment.status = "success"\npaid_at = поточний момент
+    |#lightyellow|Сервіс підписок|
+    :activateSubscription(subscriptionId, paid_at);
+    note right: REQ-02 - Subscription.status = "active"\nstarted_at = paid_at\nexpires_at = started_at + 30 днів
+    fork
+      |#lightyellow|Сервіс платежів|
+      :returnPaymentId("pay-01");
+    fork again
+      |#lightgreen|Веб-UI|
+      :subscriptionActivated(subscriptionId);
+      |#lightblue|Читач|
+      :showResult("active");
+    end fork
+    stop
+  else (• відмова)
+    |#lightyellow|Сервіс підписок|
+    :cancelSubscription(subscriptionId);
+    note right: REQ-03 - Subscription.status = "canceled"\nPayment зі status = "success" не створюється
+    |#lightgreen|Веб-UI|
+    :subscriptionDeclined(subscriptionId);
+    |#lightblue|Читач|
+    :showError("authorization_declined");
+    stop
+  endif
+endif
+@enduml
