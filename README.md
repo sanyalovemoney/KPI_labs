@@ -33,15 +33,14 @@ Lab1 ER  ->  Lab2 UC  ->  Lab3 Sequence  ->  Lab4 Process  ->  Lab5 Architecture
 | # | Завдання | Модель | Дедлайн | Статус |
 |---|----------|--------|---------|--------|
 | 1 | [ER](Labs/lab1-er/) | дані | 10.10.2026 | здано 11.11.2026, точка входу — [DEFENSE](Labs/lab1-er/DEFENSE.md) |
-| 2 | Use Cases | вимоги | 24.10.2026 | здано 14.11.2026, цикл v2 14.11.2026, точка входу — [DEFENSE](Labs/lab2-usecases/DEFENSE.md) |
-| 3 | Sequence | взаємодія | 21.11.2026 | здано 19.11.2026, точка воходу — [DEFENSE](Labs/lab3-sequence/DEFENSE.md) |
-| 4 | Process | процес | 05.12.2026 | здано 25.11.2026, точка входу — [DEFENSE](labs/lab4-process/DEFENSE.md) |
-| 5 | Architecture | архітектура | 19.12.2026 | не почато |
+| 2 | [Use Cases](Labs/lab2-usecases/) | вимоги | 24.10.2026 | здано 14.11.2026, цикл v2 14.11.2026, точка входу — [DEFENSE](Labs/lab2-usecases/DEFENSE.md) |
+| 3 | [Sequence](Labs/lab3-sequence/) | взаємодія | 21.11.2026 | здано 19.11.2026, точка входу — [DEFENSE](Labs/lab3-sequence/DEFENSE.md) |
+| 4 | [Process](Labs/lab4-process/) | процес | 05.12.2026 | здано 25.11.2026, точка входу — [DEFENSE](Labs/lab4-process/DEFENSE.md) |
+| 5 | [Architecture](Labs/lab5-architecture/) | архітектура | 19.12.2026 | здано 26.11.2026, точка входу — [DEFENSE](Labs/lab5-architecture/DEFENSE.md) |
 
 Порядок комітів для кожної лаби: task+readme -> spec -> модель v1 -> фікси з
 аудиту (по одному на розбіжність) -> AUDIT -> ADR -> DEFENSE. Дати — реальні
 дати виконання, без перемотування.
-
 ## Здача
 
 Кожне завдання здається двома входами:
