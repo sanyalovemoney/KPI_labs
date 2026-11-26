@@ -1,0 +1,68 @@
+@startuml components
+title Компонентна діаграма — онлайн-бібліотека з підпискою (Lab5)
+left to right direction
+
+' ================= Межа системи =================
+package "Онлайн-бібліотека з підпискою  [межа системи]" {
+  component "Веб-UI\n(UI+API)" as UI
+  component "Сервіс бібліотеки" as Lib
+  component "Сервіс підписок" as Subs
+  component "Сервіс платежів" as Pay
+  component "Планувальник" as Sched
+  component "Data Access" as DA
+  database "БД" as DB
+
+  ' provided-інтерфейси (всередині системи)
+  interface "ISubscription" as ISub
+  interface "ILibrary" as ILib
+  interface "INotification" as INotify
+
+  ' required-порти (всередині, на межі)
+  interface "PaymentGatewayPort" as PGP
+  interface "MailPort" as MP
+}
+
+' ================= Зовнішні системи =================
+component "Платіжний шлюз\n(зовнішня система)" as Gateway
+component "Поштовий сервіс\n(зовнішня система)" as Mail
+
+' ================= Provided (lollipop) =================
+Subs - ISub
+Lib - ILib
+UI - INotify
+
+' ================= UI використовує API сервісів =================
+UI ..> ISub : submitSubscription / create
+UI ..> ILib : borrow / read / review / moderate
+
+' ================= Сервіс-сервіс (один напрямок, без циклу) =================
+Pay ..> ISub : activate / cancel
+Pay ..> INotify : subscriptionActivated / Declined
+Subs ..> INotify : userNotActive
+Sched ..> ILib : remindDueLoans / resend
+
+' ================= Required-порти =================
+Subs ..> PGP : authorizePayment()
+Pay ..> PGP : returnPaymentId()
+Lib ..> MP : листи (UC02)
+
+' ================= Персистентність =================
+Subs --> DA
+Pay --> DA
+Lib --> DA
+DA --> DB
+
+' ================= Порти до зовнішніх систем =================
+PGP ..> Gateway : протокол шлюзу
+MP ..> Mail : SMTP / API
+
+legend right
+  <b>Перевірки на рендері</b>
+  • 6 компонентів + БД у межах
+  • 3 provided: ISubscription, ILibrary, INotification
+  • 2 required-порти: PaymentGatewayPort, MailPort
+  • 2 зовнішні системи поза межами
+  • немає ребер UI→Data Access та Subs↔Lib
+endlegend
+
+@enduml
